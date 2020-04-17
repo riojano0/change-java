@@ -1,7 +1,10 @@
 @echo off
 
+SET SCRIPT_DIR=%~dp0
+SET FILE_VERSION=%SCRIPT_DIR%/java-location.txt
+SET JAVA_TARGET=%1
 
-REM https://sites.google.com/site/eneerge/scripts/batchgotadmin
+REM Original permission batch code https://sites.google.com/site/eneerge/scripts/batchgotadmin
 :: BatchGotAdmin
 :-------------------------------------
 REM  --> Check for permissions
@@ -14,6 +17,12 @@ REM  --> Check for permissions
 REM --> If error flag set, we do not have admin.
 if '%errorlevel%' NEQ '0' (
     echo Requesting administrative privileges...
+    for /F "eol=# delims== tokens=1,*" %%a in (%FILE_VERSION%) do (
+        IF "%%a" == "%JAVA_TARGET%" (
+            echo "Trying to use %%b Restart your console/app to take effect"
+        )
+    )
+
     goto UACPrompt
 
     echo "B"
@@ -27,8 +36,6 @@ if '%errorlevel%' NEQ '0' (
     "%temp%\getadmin.vbs"
     del "%temp%\getadmin.vbs"
 
-    echo %OUTPUT_MESSAGE%
-
     exit /B
 
 :gotAdmin
@@ -38,15 +45,10 @@ if '%errorlevel%' NEQ '0' (
     echo "C"
 :--------------------------------------   
 
-SET SCRIPT_DIR=%~dp0
-SET FILE_VERSION=%SCRIPT_DIR%/java-location.txt
-SET JAVA_TARGET=%1
+REM Here is execute code in admin rights
 
 for /F "eol=# delims== tokens=1,*" %%a in (%FILE_VERSION%) do (
-
     IF "%%a" == "%JAVA_TARGET%" (
-        SET OUTPUT_MESSAGE="Change to use %%b Restart your console/app to take effect"
         SETX /M JAVA_HOME "%%b"
     )
-
 )
